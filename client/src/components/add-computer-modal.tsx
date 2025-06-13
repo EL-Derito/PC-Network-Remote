@@ -178,6 +178,7 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
                         <SelectItem value="8GB DDR3">8GB DDR3</SelectItem>
                         <SelectItem value="16GB DDR3">16GB DDR3</SelectItem>
                         <SelectItem value="32GB DDR3">32GB DDR3</SelectItem>
+                        <SelectItem value="64GB DDR3">64GB DDR3</SelectItem>
                         <SelectItem value="4GB DDR4">4GB DDR4</SelectItem>
                         <SelectItem value="8GB DDR4">8GB DDR4</SelectItem>
                         <SelectItem value="16GB DDR4">16GB DDR4</SelectItem>
@@ -187,6 +188,7 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
                         <SelectItem value="8GB DDR5">8GB DDR5</SelectItem>
                         <SelectItem value="16GB DDR5">16GB DDR5</SelectItem>
                         <SelectItem value="32GB DDR5">32GB DDR5</SelectItem>
+                        <SelectItem value="64GB DDR5">64GB DDR5</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
