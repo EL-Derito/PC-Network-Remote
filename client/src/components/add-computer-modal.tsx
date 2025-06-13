@@ -16,7 +16,9 @@ import { z } from "zod";
 
 const formSchema = insertComputerSchema.extend({
   ipAddress: z.string().regex(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/, "Invalid IP address format"),
-});
+  storageType: z.string().min(1, "Storage type is required"),
+  storageSize: z.string().min(1, "Storage size is required"),
+}).omit({ storage: true });
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -37,7 +39,8 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
       name: "",
       processor: "",
       ram: "",
-      storage: "",
+      storageType: "",
+      storageSize: "",
       ipAddress: "",
       remoteEnabled: false,
       remotePassword: "",
@@ -49,11 +52,17 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
 
   useEffect(() => {
     if (computer) {
+      // Parse existing storage format like "512GB SSD" to separate type and size
+      const storageMatch = computer.storage.match(/(\d+\w+)\s+(.+)/);
+      const storageSize = storageMatch ? storageMatch[1] : "";
+      const storageType = storageMatch ? storageMatch[2] : "";
+      
       form.reset({
         name: computer.name,
         processor: computer.processor,
         ram: computer.ram,
-        storage: computer.storage,
+        storageType: storageType,
+        storageSize: storageSize,
         ipAddress: computer.ipAddress,
         remoteEnabled: computer.remoteEnabled,
         remotePassword: computer.remotePassword || "",
@@ -64,7 +73,8 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
         name: "",
         processor: "",
         ram: "",
-        storage: "",
+        storageType: "",
+        storageSize: "",
         ipAddress: "",
         remoteEnabled: false,
         remotePassword: "",
@@ -78,8 +88,13 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
       const url = isEditing ? `/api/computers/${computer.id}` : "/api/computers";
       const method = isEditing ? "PATCH" : "POST";
       
-      const payload = isEditing ? updateComputerSchema.parse(data) : data;
-      await apiRequest(method, url, payload);
+      // Combine storageSize and storageType into storage field
+      const { storageType, storageSize, ...rest } = data;
+      const storage = `${storageSize} ${storageType}`;
+      const payload = { ...rest, storage };
+      
+      const validatedPayload = isEditing ? updateComputerSchema.parse(payload) : insertComputerSchema.parse(payload);
+      await apiRequest(method, url, validatedPayload);
     },
     onSuccess: () => {
       toast({
@@ -198,32 +213,20 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
 
               <FormField
                 control={form.control}
-                name="storage"
+                name="storageType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Storage</FormLabel>
+                    <FormLabel>Storage Type</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select Storage" />
+                          <SelectValue placeholder="Select Storage Type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="150GB HDD">150GB HDD</SelectItem>
-                        <SelectItem value="250GB HDD">250GB HDD</SelectItem>
-                        <SelectItem value="512GB HDD">512GB HDD</SelectItem>
-                        <SelectItem value="1TB HDD">1TB HDD</SelectItem>
-                        <SelectItem value="2TB HDD">2TB HDD</SelectItem>
-                        <SelectItem value="150GB SSD">150GB SSD</SelectItem>
-                        <SelectItem value="250GB SSD">250GB SSD</SelectItem>
-                        <SelectItem value="512GB SSD">512GB SSD</SelectItem>
-                        <SelectItem value="1TB SSD">1TB SSD</SelectItem>
-                        <SelectItem value="2TB SSD">2TB SSD</SelectItem>
-                        <SelectItem value="150GB M.2">150GB M.2</SelectItem>
-                        <SelectItem value="250GB M.2">250GB M.2</SelectItem>
-                        <SelectItem value="512GB M.2">512GB M.2</SelectItem>
-                        <SelectItem value="1TB M.2">1TB M.2</SelectItem>
-                        <SelectItem value="2TB M.2">2TB M.2</SelectItem>
+                        <SelectItem value="HDD">HDD</SelectItem>
+                        <SelectItem value="SSD">SSD</SelectItem>
+                        <SelectItem value="M.2">M.2</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -231,6 +234,31 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="storageSize"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Storage Size</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Storage Size" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="150GB">150GB</SelectItem>
+                      <SelectItem value="250GB">250GB</SelectItem>
+                      <SelectItem value="512GB">512GB</SelectItem>
+                      <SelectItem value="1TB">1TB</SelectItem>
+                      <SelectItem value="2TB">2TB</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
