@@ -1,3 +1,10 @@
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import ComputerTable from "@/components/computer-table";
 import { useQuery } from "@tanstack/react-query";
 import { Monitor, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +28,24 @@ export default function StatsOverview() {
     },
   });
 
+  const { data: computers = [] } = useQuery({
+    queryKey: ["/api/computers"],
+    queryFn: async () => {
+      const response = await fetch("/api/computers");
+      if (!response.ok) {
+        throw new Error("Failed to fetch computers");
+      }
+      return response.json();
+    },
+  });
+
+  const getFilteredComputers = (status?: string) => {
+    if (!status) return computers;
+    if (status === "warning")
+      return computers.filter((c: any) => c.status === "warning");
+    return computers.filter((c: any) => c.status === status);
+  };
+
   const statCards = [
     {
       title: "Total Computers",
@@ -28,6 +53,7 @@ export default function StatsOverview() {
       icon: Monitor,
       bgColor: "bg-blue-50",
       iconColor: "text-blue-600",
+      status: undefined,
     },
     {
       title: "Online",
@@ -35,6 +61,7 @@ export default function StatsOverview() {
       icon: CheckCircle,
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
+      status: "online",
     },
     {
       title: "Offline",
@@ -42,6 +69,7 @@ export default function StatsOverview() {
       icon: XCircle,
       bgColor: "bg-red-50",
       iconColor: "text-red-600",
+      status: "offline",
     },
     {
       title: "Alerts",
@@ -49,26 +77,41 @@ export default function StatsOverview() {
       icon: AlertTriangle,
       bgColor: "bg-orange-50",
       iconColor: "text-orange-600",
+      status: "warning",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <Accordion type="multiple" className="mb-8">
       {statCards.map((stat, index) => (
-        <Card key={index} className="border border-gray-200">
-          <CardContent className="p-6">
+        <AccordionItem value={stat.title} key={index}>
+          <AccordionTrigger>
             <div className="flex items-center">
               <div className={`p-2 ${stat.bgColor} rounded-lg`}>
                 <stat.icon className={`${stat.iconColor} h-6 w-6`} />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  {stat.title}
+                </p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {stat.value}
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </AccordionTrigger>
+          <AccordionContent>
+            <ComputerTable
+              computers={stat.status ? getFilteredComputers(stat.status) : computers}
+              isLoading={false}
+              onEdit={() => {}}
+              onDelete={() => {}}
+              onConnectRemote={() => {}}
+              onRefresh={() => {}}
+            />
+          </AccordionContent>
+        </AccordionItem>
       ))}
-    </div>
+    </Accordion>
   );
 }

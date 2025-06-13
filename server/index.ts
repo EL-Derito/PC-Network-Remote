@@ -1,10 +1,48 @@
 import express, { type Request, Response, NextFunction } from "express";
+import session from "express-session";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Session and Passport setup
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "secret-key",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    try {
+      const user = await storage.getUserByUsername(username);
+      if (!user || user.password !== password) {
+        return done(null, false, { message: "Invalid credentials" });
+      }
+      return done(null, user);
+    } catch (err) {
+      return done(err);
+    }
+  })
+);
+passport.serializeUser((user: any, done) => done(null, user.id));
+passport.deserializeUser(async (id: number, done) => {
+  try {
+    const user = await storage.getUser(id);
+    done(null, user || false);
+  } catch (err) {
+    done(err);
+  }
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -59,7 +97,7 @@ app.use((req, res, next) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  app.listen(8080, '127.0.0.1', () => {
+  app.listen(8080, "127.0.0.1", () => {
     console.log("Server running on http://127.0.0.1:8080");
   });
 })();

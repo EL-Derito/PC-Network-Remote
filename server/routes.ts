@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertComputerSchema, updateComputerSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
+import passport from "passport";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all computers
@@ -118,6 +119,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching stats:", error);
       res.status(500).json({ message: "Failed to fetch statistics" });
+    }
+  });
+
+  // Login route
+  app.post("/api/login", passport.authenticate("local"), (req, res) => {
+    res.json({ message: "Login successful" });
+  });
+
+  // Logout route
+  app.post("/api/logout", (req, res) => {
+    req.logout(() => {
+      res.json({ message: "Logged out" });
+    });
+  });
+
+  // Auth check route
+  app.get("/api/auth/check", (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json({ authenticated: true, user: req.user });
+    } else {
+      res.status(401).json({ authenticated: false });
     }
   });
 
