@@ -345,15 +345,12 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
         </div>
         {/* Computer Inventory */}
         <div className="bg-white rounded-lg shadow mb-8 mt-8">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center">
-            <h2 className="text-lg font-medium text-gray-900">Computer Inventory</h2>
-          </div>
           <div>
             {/* Table Header with Actions */}
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div />
-                <div className="mt-4 sm:mt-0 flex space-x-3">
+                <h2 className="text-lg font-medium text-gray-900 mb-2 sm:mb-0">Computer Inventory</h2>
+                <div className="flex space-x-3">
                   <div className="relative">
                     <Input
                       type="text"
