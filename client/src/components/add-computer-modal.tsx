@@ -174,12 +174,19 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="4GB DDR3">4GB DDR3</SelectItem>
+                        <SelectItem value="8GB DDR3">8GB DDR3</SelectItem>
+                        <SelectItem value="16GB DDR3">16GB DDR3</SelectItem>
+                        <SelectItem value="32GB DDR3">32GB DDR3</SelectItem>
                         <SelectItem value="4GB DDR4">4GB DDR4</SelectItem>
                         <SelectItem value="8GB DDR4">8GB DDR4</SelectItem>
                         <SelectItem value="16GB DDR4">16GB DDR4</SelectItem>
                         <SelectItem value="32GB DDR4">32GB DDR4</SelectItem>
                         <SelectItem value="64GB DDR4">64GB DDR4</SelectItem>
-                        <SelectItem value="64GB ECC DDR4">64GB ECC DDR4</SelectItem>
+                        <SelectItem value="4GB DDR5">4GB DDR5</SelectItem>
+                        <SelectItem value="8GB DDR5">8GB DDR5</SelectItem>
+                        <SelectItem value="16GB DDR5">16GB DDR5</SelectItem>
+                        <SelectItem value="32GB DDR5">32GB DDR5</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -193,9 +200,30 @@ export default function AddComputerModal({ isOpen, onClose, onSuccess, computer 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Storage</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., 1TB NVMe SSD" {...field} />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Storage" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="150GB HDD">150GB HDD</SelectItem>
+                        <SelectItem value="250GB HDD">250GB HDD</SelectItem>
+                        <SelectItem value="512GB HDD">512GB HDD</SelectItem>
+                        <SelectItem value="1TB HDD">1TB HDD</SelectItem>
+                        <SelectItem value="2TB HDD">2TB HDD</SelectItem>
+                        <SelectItem value="150GB SSD">150GB SSD</SelectItem>
+                        <SelectItem value="250GB SSD">250GB SSD</SelectItem>
+                        <SelectItem value="512GB SSD">512GB SSD</SelectItem>
+                        <SelectItem value="1TB SSD">1TB SSD</SelectItem>
+                        <SelectItem value="2TB SSD">2TB SSD</SelectItem>
+                        <SelectItem value="150GB M.2">150GB M.2</SelectItem>
+                        <SelectItem value="250GB M.2">250GB M.2</SelectItem>
+                        <SelectItem value="512GB M.2">512GB M.2</SelectItem>
+                        <SelectItem value="1TB M.2">1TB M.2</SelectItem>
+                        <SelectItem value="2TB M.2">2TB M.2</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
