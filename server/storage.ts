@@ -69,7 +69,13 @@ export class MemStorage implements IStorage {
 
     sampleComputers.forEach(computer => {
       const id = this.currentComputerId++;
-      const newComputer: Computer = { ...computer, id };
+      const newComputer: Computer = { 
+        ...computer, 
+        id,
+        status: computer.status || "offline",
+        remoteEnabled: computer.remoteEnabled || false,
+        remotePassword: computer.remotePassword || null
+      };
       this.computers.set(id, newComputer);
     });
   }
@@ -103,7 +109,13 @@ export class MemStorage implements IStorage {
 
   async createComputer(insertComputer: InsertComputer): Promise<Computer> {
     const id = this.currentComputerId++;
-    const computer: Computer = { ...insertComputer, id };
+    const computer: Computer = { 
+      ...insertComputer, 
+      id,
+      status: insertComputer.status || "offline",
+      remoteEnabled: insertComputer.remoteEnabled || false,
+      remotePassword: insertComputer.remotePassword || null
+    };
     this.computers.set(id, computer);
     return computer;
   }

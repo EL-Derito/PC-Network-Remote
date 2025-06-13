@@ -12,8 +12,8 @@ import type { Computer } from "@shared/schema";
 
 export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [ramFilter, setRamFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isRemoteModalOpen, setIsRemoteModalOpen] = useState(false);
   const [selectedComputer, setSelectedComputer] = useState<Computer | null>(null);
@@ -23,7 +23,7 @@ export default function Dashboard() {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (searchQuery) params.append("search", searchQuery);
-      if (statusFilter) params.append("status", statusFilter);
+      if (statusFilter && statusFilter !== "all") params.append("status", statusFilter);
       
       const response = await fetch(`/api/computers?${params}`);
       if (!response.ok) {
@@ -33,12 +33,7 @@ export default function Dashboard() {
     },
   });
 
-  const filteredComputers = computers.filter(computer => {
-    if (ramFilter && !computer.ram.toLowerCase().includes(ramFilter.toLowerCase())) {
-      return false;
-    }
-    return true;
-  });
+  const filteredComputers = computers;
 
   const handleConnectRemote = (computer: Computer) => {
     if (computer.remoteEnabled && computer.remotePassword) {
@@ -105,24 +100,14 @@ export default function Dashboard() {
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="online">Online</SelectItem>
                   <SelectItem value="offline">Offline</SelectItem>
                   <SelectItem value="warning">Warning</SelectItem>
                 </SelectContent>
               </Select>
               
-              <Select value={ramFilter} onValueChange={setRamFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue placeholder="All RAM" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All RAM</SelectItem>
-                  <SelectItem value="8GB">8GB+</SelectItem>
-                  <SelectItem value="16GB">16GB+</SelectItem>
-                  <SelectItem value="32GB">32GB+</SelectItem>
-                </SelectContent>
-              </Select>
+
             </div>
           </div>
 
